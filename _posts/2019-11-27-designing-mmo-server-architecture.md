@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      Designing an MMO - Server Architecture
-date:       2019-11-05 12:15:00
+date:       2019-11-27 12:15:00
 author:     Jon Winsley
 comments:   true
 summary:    MMOs have different server requirements than other multiplayer games. Let's talk strategy.
@@ -62,5 +62,3 @@ We'll create a Connection Server that will host the websocket. This server will 
 ## Conclusions
 
 We aren't spending too much time on these details right now, as this will mostly be relevant when the game is released and needs to be scaled. But it's helpful to plan ahead a little bit so we're prepared when that time comes!
-
-Next, we'll figure out how to set up our dev environment with Docker, such that we can easily and repeatably fire up a test instance of our game server while we're developing it.
