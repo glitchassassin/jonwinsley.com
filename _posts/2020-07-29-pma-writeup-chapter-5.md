@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "PMA Labs Writeup: IDA Pro"
-date:       2020-07-29 15:00:00
+date:       2020-07-30 09:00:00
 author:     Jon Winsley
 comments:   true
 summary:    My analysis of the disassembly labs in Chapter 5 of "Practical Malware Analysis".
