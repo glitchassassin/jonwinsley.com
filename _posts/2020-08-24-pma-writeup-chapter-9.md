@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "PMA Labs Writeup: OllyDbg"
-date:       2020-08-04 15:00:00
+date:       2020-08-24 15:00:00
 author:     Jon Winsley
 comments:   true
 summary:    My analysis of the debugging labs in Chapter 9 of "Practical Malware Analysis".
@@ -162,4 +162,56 @@ The malware exits almost as soon as it starts. Initial dynamic analysis is fruit
 
 ### Disassembly & Debugging
 
-The first thing we notice is that it's checking its own filename. We'll fast-forward through the logic to strcmp and add a breakpoint to inspect the parameters. Sure enough: it's checking if the filename equals `ocl.exe`. Let's change it and see what happens next.
+The first thing we notice is that it's checking its own filename. We'll fast-forward through the logic to strcmp and add a breakpoint to inspect the parameters. Sure enough: it's checking if the filename equals `ocl.exe`. Stepping through the program and sniffing with Wireshark, we see it tries to connect to www[.]practicalmalwareanalysis.com on port 9999. If successful, it launches `sub_401000`.
+
+We can set up a netcat listener on port 9999 of our Ubuntu analysis machine. When we do, and allow execution to proceed, it turns into a reverse shell! The malware uses CreateProcessA to spawn a `cmd` process, piping the stdin and stdout back through the socket. We now have an interactive command prompt.
+
+Let's step back for a moment and look at the string obfuscation. Starting at 0x00401133, the malware moves characters one byte at a time into the space at var_1B0. This is passed later, along with a copy of some scrambled data copied from 0x00405034, to `sub_401089`. This is a for loop that XORs the key (the string in var_1B0 from earlier) with the data (copied from 0x00405034).
+
+Aside from the simple reverse shell, there does not appear to be any persistence or other interesting behavior.
+
+## Lab 09-03
+
+### Static Analysis
+
+Lab09-03.exe shows no immediate signs of being packed. It imports a few functions from DLL1.dll and DLL2.dll, which we'll get to in a moment. Other interesting imports include WriteFile from kernel32.dll and NetScheduleJobAdd from netapi32.dll.
+
+DLL1.dll imports several functions, but none that are obviously of interest, and exports DLL1Print. Its image base is 0x10000000.
+
+DLL2.dll imports CreateFileA from kernel32.dll, among others, and exports DLL2Print and DLL2ReturnJ. Its image base is 0x10000000.
+
+DLL3.dll imports several functions, but none that are obviously of interest, and exports DLL3GetStructure and DLL3Print. Its image base is 0x10000000.
+
+Interesting strings include:
+
+```plaintext
+Lab09-03.exe:
+malwareanalysisbook.com
+
+DLL1.dll:
+DLL 1 mystery data %d
+
+DLL2.dll:
+temp.txt
+DLL 2 mystery data %d
+
+DLL3.dll:
+ping www.malwareanalysisbook.com
+DLL 3 mystery data %d
+```
+
+### Debugging
+
+When we initially load the malware into OllyDbg, the memory map reveals that DLL1 has been loaded into its preferred space of 0x10000000. DLL2 has been given the space 0x00330000, and DLL3 has not been loaded yet.
+
+Stepping through the program, DLL1Print seems to just invoke `printf` with a global variable and the above "mystery data" template string. If we check in IDA, this global variable is being set in DLLMain to the current process ID.
+
+Cheating a little bit (perhaps), we take a peek at DLL2.dll in IDA and see it's following a similar pattern. Instead of saving the process ID to a global variable, however, it opens a file called `temp.txt` and saves the handle to a global variable. DLL2Print prints that handle, and DLL2ReturnJ returns the handle. To align our IDA analysis with what we see in OllyDbg, we can rebase the code at the actual load address rather than the DLL's preferred load address.
+
+DLL3 defines a data structure in DLLMain, which is returned by DLL3GetStructure. DLL3Print prints the pointer to the unicode command in the data structure.
+
+Going back to the main executable, we see that the malware is getting the file handle from DLL2.dll and writing to that file. Then it gets the pointer to the data structure in DLL3, and passes that to NetScheduleJobAdd.
+
+# Wrap-up
+
+I've enjoyed the labs thus far. I think they've given me a reasonable grounding in reverse engineering, especially for the Windows platform. Nevertheless, for a couple reasons, I've decided to skip the remaining labs and just read through the rest of the book. I expect this will still give me a base of knowledge about the field, but I don't have any immediate plans to jump into malware analysis full time.
