@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Screeps: The Game Plan"
-date:       2020-08-24 15:00:00
+date:       2020-09-21 14:00:00
 author:     Jon Winsley
 comments:   true
 summary:    Diving into the deep end and implementing a flexible task manager in Screeps
