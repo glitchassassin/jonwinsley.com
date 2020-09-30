@@ -47,5 +47,31 @@ Expanding beyond my initial room has proven to be a more significant hurdle than
 * I had started caching paths for TravelTasks in Memory with `RoomPosition.findPathTo`. These paths end abruptly at the end of the room, so I switched to PathFinder instead for inter-room travel.
 * While I was at it, I shifted all of my architecture away from loading Memory each tick, and instead am only loading from Memory after a code push or global reset. From then on data is saved to Memory, but read from the heap.
 * When my creeps aren't in a room, I lose visibility to Sources, ConstructionSites, and unowned structures like Containers. I had to start caching these as well.
+* There is no built-in function to calculate range between two RoomPositions in different rooms.
 
-This led to some further refactoring, along the lines of the previous post, 
+This led to some deeper refactoring. I created "cached" classes for important things like sources, construction sites, and containers, so the Office can keep track of them even when there is no visibility. These are generally managed by Analysts, which are scoped to the Boardroom level, so results are shared between Offices (where appropriate).
+
+Not everything needs to be cached: owned structures and depots grant sight, so we only need to store their IDs and reconstitute them each tick.
+
+I still had a few task-related functions that expected an actual game object: harvesting, for example, expected a Source. Instead I am passing the cached room position of the source, so the minion can get there, and then looking for the source in that square when the minion is in position.
+
+I have not completely solved the range-between-rooms question. For now, I'm just rounding to 50 per room, which is close enough to test with. I'll implement some proper geometry calculations eventually.
+
+As of today, I think I've worked through most of the underlying architecture changes. On a private server, my minions are able to quickly start multiplying and spreading to adjacent rooms to harvest. Next I plan to start tuning and testing my expansion priorities, but for that I will need some better visibility into the AI's state and decision making.
+
+I already have some rudimentary reports in the console for task management and a few other subsystems, but I want to improve this and start leveraging RoomVisuals (and perhaps the new MapVisuals) to make it easier to monitor what exactly is going on. We'll tackle that in the next post.
+
+# The Theme So Far
+
+I started laying out the "theme" of my AI in the last post. Let's expand on that, just for fun.
+
+* The Grey Company is a sprawling corporation with global aspirations.
+* The Boardroom oversees individual Offices (claimed rooms). Eventually these Offices will be named for world capitals (the London office, e.g.).
+* Each Office manages its surrounding Territories, setting up Franchises at the Sources.
+* Salesmen man the Franchises and collect income as Energy. 
+* Lawyers lay claim to Controllers to carve out Territories.
+* Security, of course, defends the Office and its Territories
+* Distributors haul energy from Franchises
+* Engineers build and repair structures
+
+We'll fill this out a little more as we go.
