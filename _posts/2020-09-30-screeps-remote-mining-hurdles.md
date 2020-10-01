@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Screeps #6: Remote Mining Hurdles"
-date:       2020-09-27 12:00:00
+date:       2020-09-30 21:25:00
 author:     Jon Winsley
 comments:   true
 summary:    Finding a better way to track and prioritize work as we expand into other rooms
