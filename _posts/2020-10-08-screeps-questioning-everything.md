@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Screeps #10: Questioning Everything"
-date:       2020-10-07 08:00:00
+date:       2020-10-12 14:00:00
 author:     Jon Winsley
 comments:   true
 summary:    In which we look back over our progress so far and evaluate what has worked and what needs improvement.
@@ -59,5 +59,16 @@ This solves the issue we had previously with assigning too many Carriers to smal
 
 Since we're breaking out logistics entirely, much of our existing task system becomes irrelevant. We're left with simple tasks like building, repairing, upgrading, and exploring. But we're already locking some of our minions down to their specialties: Salesmen and Carriers have specific builds. Lawyers and Engineers both require WORK parts, but Lawyers rarely need to move quickly, so we can save on their MOVE parts. Engineers do need to get around to construction sites across our territories.
 
-So if we're shifting towards optimizing minions by role, it doesn't make a lot of sense to have a single shared task system with all the requests. Instead, we'll let each manager arrange tasks for its own minions. But the code for handling tasks and assignments can be shared between the different managers: we'll create a common OfficeTaskManager class that these task-managing managers can inherit from.
+So if we're shifting towards optimizing minions by role, it doesn't make a lot of sense to have a single shared task system with all the requests. Instead, we'll let each manager arrange tasks for its own minions. But the code for handling tasks and assignments can be shared between the different managers: we'll create a common OfficeTaskManager class from which these task-managing managers can inherit the behavior.
 
+## Depot Logic
+
+Because I'm still irrationally obsessed with good startup code - and because I suspect depots will be relevant for some time after - let's revisit our mobile depots a bit too. These function just like any other Logistics request, with the exception that they are always the endpoint of a route: no other requests are accepted. Since depots really have no time constraint, this prevents requests from being accepted and then backlogged indefinitely. Then the requestor of the depot (FacilitiesManager, for example) is responsible to track when the depot is no longer needed and cancel the request (if the builder minion dies early, perhaps).
+
+We could do some optimization in the future to "back-fill" a short route that ends below capacity at a Depot, but in most cases the Depot request's capacity will be more than a single Carrier can manage anyway, so we should not lose too much efficiency here.
+
+A larger concern might be scaling the Depot request's effective throughput. If we have a single relatively close builder minion, it doesn't make sense to dedicate five Carriers to the construction site's Depot. We really only need enough on site to keep the builder supplied: other carriers can be fulfilling other requests, or (when the depot is running low) set off to replace the current Carrier.
+
+# Conclusions
+
+Refills run much more smoothly now. Logistics requests are being handled more effectively, and it's time to start thinking about how to scale up our Builder and Upgrader minions to take advantage of the increased throughput.
