@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Screeps #12: Strategic Directives - World State"
-date:       2020-10-17 14:30:00
+date:       2020-10-21 22:50:00
 author:     Jon Winsley
 comments:   true
 summary:    
