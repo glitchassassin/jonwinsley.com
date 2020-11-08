@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Screeps #14: Decision Making"
-date:       2020-10-29 15:45:00
+date:       2020-11-07 22:55:00
 author:     Jon Winsley
 comments:   true
 summary:    
