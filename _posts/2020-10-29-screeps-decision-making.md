@@ -54,7 +54,7 @@ upgradeTask = Sequence(
 )
 ```
 
-A "Sequence" here represents a series of tasks to be followed one after the other, and a "Selector" represents a series of tasks to be tried until one succeeds. (I'm indebted to Millington and Funge's Artificial Intelligence for Games for the terms and concepts.) So the upgradeTask will get energy from its assigned depot, or, if that fails, from the closest supply of available energy. Then it will mark the controller (or skip the step, if that's already done), and finally use the energy it has gathered to upgrade the controller.
+A "Sequence" here represents a series of tasks to be followed one after the other until one fails, and a "Selector" represents a series of tasks to be tried until one succeeds. (I'm indebted to Millington and Funge's Artificial Intelligence for Games for the terms and concepts.) So the upgradeTask will get energy from its assigned depot, or, if that fails, from the closest supply of available energy. Then it will mark the controller (or skip the step, if that's already done), and finally use the energy it has gathered to upgrade the controller.
 
 These steps can be broken down further:
 
@@ -69,40 +69,20 @@ This will allow us to easily compose task logic in a way that's easy to interpre
 
 ## Abstracting Office Strategies
 
-It's comparatively easy to manage tasks for individual minions. Let's skip past the Manager level for the moment and talk about broader office strategies; then, we'll talk about how to use Managers to delegate those strategies as minion tasks. We'll start by throwing out a handful of broad strategies and try to draw some connections between them.
+The Managers will serve as the dividing line between office-wide Strategies and individual Tasks. Rather than assigning tasks to minions directly, Strategies will create requests. We're currently having Managers create their own requests, but delegating this to the Strategy level lets these requests be coordinated.
 
-- Drop mining: Salesmen drop harvested resources on the ground for Carriers to collect
-  - Salesmen harvest sources
-  - Carriers transport resources back to main Office
-- Container mining: Salesmen drop harvested resources into Container for Carriers to collect
-  - Salesmen harvest sources
-  - Carriers transport resources back to main Office
-  - Engineers build road/container infrastructure to increase efficiency
-- Snowgoose mining: Salesmen deposit harvested resources into extensions, then Spawn creates and immediately recycles a creep to transfer the resources to a central location
-  - Salesmen harvest sources
-  - Engineers build extensions
-  - Spawn creates and recycles creeps
-  - Carriers move energy from Spawn to wherever it's needed
-- Remote Mining: exploiting sources in nearby rooms.
-  - Salesmen harvest sources
-  - Carriers transport resources back to main Office
-  - Engineers build road/container infrastructure to increase efficiency
-  - Lawyers reserve controller to increase capacity
-  - Guards defend the room against invaders
+For example, when we're just starting an Office, we might want to create a Salesman to start harvesting energy; then enough Carriers to move all the energy it's harvesting; then another Salesman to leverage the room's second source. This is easier to represent with a centralized Strategy than by trying to adjust priorities on each of the Managers' individual requests.
 
-### Mining Tasks
+I experimented with a Behavior Tree model like we used for the Tasks, but this proved to be too inflexible to work nicely for Strategies. Specifically, we needed to be able to loop over multiple items - all the Sources in an office, for example - and behavior trees don't provide a clean way to handle this.
 
-Let's break this down. When we are drop mining, we (currently) assign one or more dedicated Salesmen to the Source. They travel to the source and harvest, dropping any collected resources. The source is designated as a LogisticsSource, so nearby Carriers will collect resources from it to fulfill requests. When we graduate to container harvesting, the process for Salesmen and Carriers is the same, but we create a container construction site, which serves as a request for an Engineer. Remote mining adds requests for a Lawyer to reserve the controller and Guards (if hostile activity is detected) to protect the room.
+After trying a few different patterns, I settled on something very similar to what the Managers already had. Previously, we had a Plan phase, which would analyze the state relevant to the manager and then issue requests as needed: logistics requests, to supply energy, or spawn requests, to create more minions. Then the Run phase of each manager would prioritize and execute the requests that manager was responsible for.
 
-Following our current paradigm, we would assign requests:
+By separating the planning from the execution, it's easier to coordinate things across multiple managers. This is especially true for the SpawnStrategist, which no longer has to rely on bare priorities to decide what to spawn next, but can use complex logic like "if we have a surplus of energy piling up at the Franchises, and we have unfulfilled Logistics requests, spawn a Carrier."
 
-1. Harvest requests for SalesManager
-2. Logistics requests (if nothing else, standing order for storage)
-3. Build requests for FacilitiesManager
-4. Reserve requests for LegalManager
-5. Defense requests for DefenseManager
+This separation of concerns also means we can probably refactor further: most of the Managers are now doing the exact same thing, just for different kinds of work. We could condense this to a TaskManager, a LogisticsManager, and an HRManager to handle minion tasks, logistics, and spawning respectively. But this optimization doesn't bring much immediate value, so we'll hold off on this.
 
-Then each of those managers would request minions from HRManager. The spawn queue is where the most difficult part of the resource contention arises.
+# Conclusions
 
-Which should come first? Logically, we want the Salesmen to begin to harvest energy. But do we spawn all Salesmen until the requests are filled? If we're starting from scratch, or restarting from scratch, we have a steady trickle of 300 energy over 300 ticks regenerating at spawn. Without energy coming in, that's enough to maintain five 300-energy minions. If we have enough Harvest requests (perhaps from remote rooms), we'll never get any Carriers created.
+I've spent more time than I would like getting this straightened out, and I'm fairly happy with the results. I still have some logic from the old Managers to convert to a Strategy, and then I think we will have enough of a foundation to move forward.
 
+I would like to tackle room planning, but before I dig into it too far I should get one room to RCL8. So, it's time to scale up my private server and see how fast we can run.
