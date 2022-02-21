@@ -21,3 +21,45 @@ After opening your workspace in the devcontainer, you'll have the Rust `cargo` t
 
 ## Planning Our API
 
+Let's make a simple word game. We'll submit our guess, and the API will return a response that tells us which letters in our guess were correct. We can specify the ID for a word in our request, to guess against the same word again; otherwise, the API will select a random word for us, and return its ID in the response:
+
+```json
+// Request
+{
+    "guess": "whale",
+    "word": 0 // optional - will use random word if not provided
+}
+
+// Response
+{
+    "results": ["CORRECT", "CORRECT", "ALMOST", "WRONG", "WRONG"],
+    "word": 0,
+    "win": false
+}
+```
+
+## Setting up Rocket
+
+First things first, let's initialize our Rust project with Cargo:
+
+```
+cargo init wurtle
+cd wurtle
+```
+
+This creates `Cargo.toml`, which contains metadata about our project and its dependencies, and a `main.rs` file for us to start with. You can run this and see that it compiles and executes:
+
+```
+$ cargo run
+   Compiling wurtle v0.1.0 (/workspaces/wurtle)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.07s
+     Running `target/debug/wurtle`
+Hello, world!
+```
+
+Let's add Rocket to our dependencies in `Cargo.toml`:
+
+```
+[dependencies]
+rocket = { version = "0.5.0-rc.1", features = ["json", "msgpack", "uuid"] }
+```
