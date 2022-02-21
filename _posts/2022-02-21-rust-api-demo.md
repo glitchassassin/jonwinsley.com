@@ -147,7 +147,14 @@ Here we're creating a static variable, LINES. At compile time, cargo will read "
 
 Then we have some helper functions: we can look up words in the list by index; we can check to see if the word is valid (instead of just random characters); and we can get a random index of a word from the list. (We'll use the index as the word's id in our requests & responses.)
 
-Let's import this module in our main file and improve our `guess/` method:
+We'll need to add the `rand` dependency to our Cargo.toml:
+
+```plaintext
+[dependencies]
+rand = "0.8.5"
+```
+
+Then let's import this module in our main file and improve our `guess/` method:
 
 ```rust
 mod words;
