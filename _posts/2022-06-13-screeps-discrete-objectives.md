@@ -58,15 +58,27 @@ declare global {
 
 Each tick, if we are not currently spawning:
 
-1. If we have a scheduled minion this tick, and it is the highest priority, spawn it.
-2. If we have a scheduled minion this tick, and something else is the highest priority, the scheduled minion's schedule is revoked and it gets spawned at the next opportunity.
-3. If we have no scheduled minions this tick:
-  - For each priority in the queue:
-    - calculate the ticks until the next scheduled spawn with the same or higher priority (`t`)
-    - Find the combination of minions that we can spawn in `t` ticks that will use the most spawn time. Pick one and begin spawning.
+- For each priority level in the queue, while we have available spawns:
+    - If we have a scheduled minion this tick, and it is the highest priority, spawn it.
+    - If we have a scheduled minion this tick, and something else is the highest priority, the scheduled minion's schedule is revoked and it gets spawned at the next opportunity.
+    - If we have no scheduled minions this tick:
+        - Calculate the ticks until the next scheduled spawn with the same or higher priority (`t`)
+        - Find the combination of minions that we can spawn in `t` ticks that will use the most spawn time. Pick one and begin spawning.
 
-When we create a scheduled spawn order, it may conflict with one or more existing orders. In this case, the lowest-priority order will be shifted forward (if there is room) or else un-scheduled (to run whenever the spawn has time).
+Calculating the ticks until the next scheduled spawn is more difficult than it seems when you can have multiple spawns. Consider:
 
-### Handling Multi-Spawn Objectives
+1. Spawn1 is currently spawning a minion and has 12 ticks left
+2. Spawn2 is available, and has a minion scheduled to begin spawning in 15 ticks
+3. Spawn3 is available
+4. There is another minion scheduled to begin spawning (on any spawn) in 15 ticks
+5. There are three minions ready to spawn that will each take 24 ticks.
 
-Let's suppose we want to spawn multiple minions: maybe we want an ATTACK/HEAL duo to crack power banks. How can we make sure they spawn together? Consider the case where we only have one spawn (they should spawn one right after the other) or where we have multiple spawns (they should prefer to spawn at the same time, or else sequentially).
+No minion will start on Spawn1, because it's currently spawning. No minion will start on Spawn2 because it has a minion scheduled. The scheduled minion for #4 should be allocated to Spawn1, so that we can begin spawning one of the other three minions.
+
+We'll use the following rules to calculate next scheduled minion:
+
+1. For each spawn, if the spawn has minion(s) scheduled for it specifically, set the earliest as its next scheduled minion.
+2. For each spawn, while there are earlier scheduled minion(s) that do not conflict either with a currently scheduled/spawning minion or the next scheduled minion, set the *latest* as its next scheduled minion.
+
+
+NOTE: Let's simplify this: assume all scheduled minions also specify a spawn. This will almost always be the case anyway.
