@@ -39,10 +39,15 @@ interface SpawnOrderData {
     body: BodyPartConstant[],
     memory?: CreepMemory
 }
+interface PreferredSpawnData {
+    spawn: Id<StructureSpawn>,
+    directions?: DirectionConstant[],
+}
 interface SpawnOrder {
     startTime?: number,
     duration: number,
     priority: number,
+    spawn?: PreferredSpawnData,
     data: SpawnOrderData
 }
 declare global {
@@ -63,22 +68,154 @@ Each tick, if we are not currently spawning:
     - If we have a scheduled minion this tick, and something else is the highest priority, the scheduled minion's schedule is revoked and it gets spawned at the next opportunity.
     - If we have no scheduled minions this tick:
         - Calculate the ticks until the next scheduled spawn with the same or higher priority (`t`)
-        - Find the combination of minions that we can spawn in `t` ticks that will use the most spawn time. Pick one and begin spawning.
+        - If we can fit the current minion in before the next scheduled spawn, do so.
 
-Calculating the ticks until the next scheduled spawn is more difficult than it seems when you can have multiple spawns. Consider:
+We'll simplify this a little bit by requiring scheduled orders to also specify a spawn. This will generally be the case anyway, and makes it easier to calculate the ticks to next scheduled spawn.
 
-1. Spawn1 is currently spawning a minion and has 12 ticks left
-2. Spawn2 is available, and has a minion scheduled to begin spawning in 15 ticks
-3. Spawn3 is available
-4. There is another minion scheduled to begin spawning (on any spawn) in 15 ticks
-5. There are three minions ready to spawn that will each take 24 ticks.
+There's room for some more optimization here, but we'll save that for future us!
 
-No minion will start on Spawn1, because it's currently spawning. No minion will start on Spawn2 because it has a minion scheduled. The scheduled minion for #4 should be allocated to Spawn1, so that we can begin spawning one of the other three minions.
+## Creating Missions
 
-We'll use the following rules to calculate next scheduled minion:
+We'll call these discrete objectives Missions, to avoid conflict with the old concept of an Objective.
 
-1. For each spawn, if the spawn has minion(s) scheduled for it specifically, set the earliest as its next scheduled minion.
-2. For each spawn, while there are earlier scheduled minion(s) that do not conflict either with a currently scheduled/spawning minion or the next scheduled minion, set the *latest* as its next scheduled minion.
+```typescript
+export enum MissionStatus {
+  PENDING = 'PENDING',
+  RUNNING = 'RUNNING',
+  CANCELED = 'CANCELED',
+  DONE = 'DONE',
+}
 
+export interface Mission<T extends MissionType, D> {
+  office: string,
+  priority: number,
+  type: T,
+  status: MissionStatus,
+  creeps: Id<Creep>[],
+  data: D,
+  // Budgeting
+  estimate: {
+    cpu: number,
+    energy: number,
+  },
+  actual: {
+    cpu: number,
+    energy: number,
+  },
+}
+```
 
-NOTE: Let's simplify this: assume all scheduled minions also specify a spawn. This will almost always be the case anyway.
+We'll use objects instead of classes to make it easier to store these Missions to Memory. This interface represents a generic kind of Mission, and each MissionType will flesh out `data` with the details it needs to direct its minions.
+
+When the objective is created, we'll fill in the estimated CPU and energy needed to complete the objective. As the objective runs, the actual amounts will be updated, and when complete we'll report on the estimated vs. actual budget. This will help us improve the quality of our estimates, and perhaps cancel an objective that is taking significantly more than estimated.
+
+```typescript
+interface HarvestMissionData {
+  source: Id<Source>,
+}
+type HarvestMission = Mission<MissionType.HARVEST, HarvestMissionData>;
+
+export function createHarvestMission(office: string, source: Id<Source>): HarvestMission {
+  // Assume working full time
+  const estimate = {
+    cpu: CREEP_LIFE_TIME * 0.4,
+    energy: minionCost(MinionBuilders[MinionTypes.SALESMAN](spawnEnergyAvailable(office)))
+  }
+  return createMission({ // Helper function that fills in default values
+    office,
+    priority: 10,
+    type: MissionType.HARVEST,
+    data: {
+      source,
+    },
+    estimate,
+  })
+}
+```
+
+## Mission Control
+
+We need a process to analyze the current world state and create Missions as needed. Missions are associated with an office, but this process need not be. It might dispatch missions to multiple offices (to coordinate a claim on a new room, for example). We'll call this Mission Control.
+ 
+```typescript
+declare global {
+  interface OfficeMemory {
+      pendingMissions: Mission<MissionType, unknown>[],
+      activeMissions: Mission<MissionType, unknown>[],
+  }
+}
+
+export function runMissionControl() {
+  for (const office in Memory.offices) {
+    // Create new harvest mission for source, if it doesn't exist
+    for (const source of sourceIds(office)) {
+      if (![
+        ...Memory.offices[office].activeMissions,
+        ...Memory.offices[office].pendingMissions
+      ].some(m => 
+        m.type === MissionType.HARVEST && 
+        (m as HarvestMission).data.source === source
+      )) {
+        Memory.offices[office].pendingMissions.push(
+          createHarvestMission(office, source)
+        )
+      }
+    }
+  }
+}
+```
+
+We'll probably abstract the logic for these different types of missions into handlers later. For now, this example gives us a place to start. Here we're just checking to see if we already have a mission (scheduled or pending) for each source in the office and, if not, creating one.
+
+Now that we have missions pending, we need to start them. The first step is to calculate how much bucket we have left (cpu or energy) for each office. Energy is easy; we can just look to room storage. But CPU is a codebase-level resource. We could track individual buckets for each office, but for now it'll be easiest to just split the bucket each tick, so each office gets 1/`n` (where `n` is the number of offices).
+
+```typescript
+  // Calculate already-allocated resources
+  let cpuPerOffice = Game.cpu.bucket / Object.keys(Memory.offices).length;
+  for (const office in Memory.offices) {
+    const remainingCpu = Memory.offices[office].activeMissions
+      .reduce((remaining, mission) => 
+        remaining = (mission.estimate.energy - mission.actual.energy), 
+        cpuPerOffice
+      );
+    const remainingEnergy = Memory.offices[office].activeMissions
+      .reduce((remaining, mission) => 
+        remaining = (mission.estimate.energy - mission.actual.energy), 
+        storageEnergyAvailable(office)
+      )
+    // Start missions here
+  }
+```
+
+Now, we want to start missions by priority, as we have resources available. Actually, this logic starts to look a lot like our spawn queue. And there's some overlap: we want to be able to schedule a mission's start time, so it can in turn schedule its spawn.
+
+```typescript
+// loop through priorities, highest to lowest
+for (const priority of priorities) {
+  if (remainingCpu <= 0 || remainingEnergy <= 0) break; // No more available resources
+
+  const missions = Memory.offices[office].pendingMissions.filter(o => o.priority === priority);
+  const sortedMissions = [
+    ...missions.filter(o => o.startTime === Game.time),
+    ...missions.filter(o => o.startTime === undefined)
+  ];
+
+  // Handles scheduled missions first
+  while (sortedMissions.length) {
+    const mission = sortedMissions.shift();
+    if (!mission) break;
+    const canStart = mission.estimate.cpu < remainingCpu && mission.estimate.energy < remainingEnergy;
+    if (!canStart) {
+      mission.startTime = undefined; // Missed start time, if defined
+      continue;
+    }
+    // Mission can start
+    Memory.offices[office].pendingMissions = Memory.offices[office].pendingMissions.filter(m => m !== mission)
+    Memory.offices[office].activeMissions.push(mission);
+    // Update mission status and remaining budgets
+    mission.status = MissionStatus.RUNNING;
+    remainingCpu -= mission.estimate.cpu;
+    remainingEnergy -= mission.estimate.energy;
+  }
+}
+```
