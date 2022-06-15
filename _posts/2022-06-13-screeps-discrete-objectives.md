@@ -35,27 +35,27 @@ Each Office will have up to three queues, one per available spawn.
 
 ```typescript
 interface SpawnOrderData {
-    name: string,
-    body: BodyPartConstant[],
-    memory?: CreepMemory
+  name: string,
+  body: BodyPartConstant[],
+  memory?: CreepMemory
 }
 interface PreferredSpawnData {
-    spawn: Id<StructureSpawn>,
-    directions?: DirectionConstant[],
+  spawn: Id<StructureSpawn>,
+  directions?: DirectionConstant[],
 }
 interface SpawnOrder {
-    startTime?: number,
-    duration: number,
-    priority: number,
-    spawn?: PreferredSpawnData,
-    data: SpawnOrderData
+  startTime?: number,
+  duration: number,
+  priority: number,
+  spawn?: PreferredSpawnData,
+  data: SpawnOrderData
 }
 declare global {
-    interface OfficeMemory {
-        spawnQueues: {
-            [id: string]: SpawnOrder[]
-        }
+  interface OfficeMemory {
+    spawnQueues: {
+      [id: string]: SpawnOrder[]
     }
+  }
 }
 ```
 
@@ -81,6 +81,7 @@ We'll call these discrete objectives Missions, to avoid conflict with the old co
 ```typescript
 export enum MissionStatus {
   PENDING = 'PENDING',
+  SCHEDULED = 'SCHEDULED',
   RUNNING = 'RUNNING',
   CANCELED = 'CANCELED',
   DONE = 'DONE',
@@ -91,7 +92,7 @@ export interface Mission<T extends MissionType, D> {
   priority: number,
   type: T,
   status: MissionStatus,
-  creeps: Id<Creep>[],
+  creepNames: string[],
   data: D,
   // Budgeting
   estimate: {
@@ -170,24 +171,24 @@ We'll probably abstract the logic for these different types of missions into han
 Now that we have missions pending, we need to start them. The first step is to calculate how much bucket we have left (cpu or energy) for each office. Energy is easy; we can just look to room storage. But CPU is a codebase-level resource. We could track individual buckets for each office, but for now it'll be easiest to just split the bucket each tick, so each office gets 1/`n` (where `n` is the number of offices).
 
 ```typescript
-  // Calculate already-allocated resources
-  let cpuPerOffice = Game.cpu.bucket / Object.keys(Memory.offices).length;
-  for (const office in Memory.offices) {
-    const remainingCpu = Memory.offices[office].activeMissions
-      .reduce((remaining, mission) => 
-        remaining = (mission.estimate.energy - mission.actual.energy), 
-        cpuPerOffice
-      );
-    const remainingEnergy = Memory.offices[office].activeMissions
-      .reduce((remaining, mission) => 
-        remaining = (mission.estimate.energy - mission.actual.energy), 
-        storageEnergyAvailable(office)
-      )
-    // Start missions here
-  }
+// Calculate already-allocated resources
+let cpuPerOffice = Game.cpu.bucket / Object.keys(Memory.offices).length;
+for (const office in Memory.offices) {
+  const remainingCpu = Memory.offices[office].activeMissions
+    .reduce((remaining, mission) => 
+      remaining = (mission.estimate.energy - mission.actual.energy), 
+      cpuPerOffice
+    );
+  const remainingEnergy = Memory.offices[office].activeMissions
+    .reduce((remaining, mission) => 
+      remaining = (mission.estimate.energy - mission.actual.energy), 
+      storageEnergyAvailable(office)
+    )
+  // Start missions here
+}
 ```
 
-Now, we want to start missions by priority, as we have resources available. Actually, this logic starts to look a lot like our spawn queue. And there's some overlap: we want to be able to schedule a mission's start time, so it can in turn schedule its spawn.
+Now, we want to start missions by priority, as we have resources available. Actually, this logic starts to look a lot like our spawn queue. And there's some overlap: we want to be able to schedule a mission's start time, so it can in turn schedule its spawn. So we'll actually start missions before they are scheduled, and just leave them in a SCHEDULED state. Not too far ahead of the scheduled date though - we'll do a creep's lifetime, as that's also the length of a spawn queue.
 
 ```typescript
 // loop through priorities, highest to lowest
@@ -196,7 +197,7 @@ for (const priority of priorities) {
 
   const missions = Memory.offices[office].pendingMissions.filter(o => o.priority === priority);
   const sortedMissions = [
-    ...missions.filter(o => o.startTime === Game.time),
+    ...missions.filter(o => o.startTime && o.startTime <= Game.time + CREEP_LIFE_TIME),
     ...missions.filter(o => o.startTime === undefined)
   ];
 
@@ -213,9 +214,68 @@ for (const priority of priorities) {
     Memory.offices[office].pendingMissions = Memory.offices[office].pendingMissions.filter(m => m !== mission)
     Memory.offices[office].activeMissions.push(mission);
     // Update mission status and remaining budgets
-    mission.status = MissionStatus.RUNNING;
+    mission.status = mission.startTime && mission.startTime !== Game.time ? MissionStatus.SCHEDULED : MissionStatus.RUNNING;
     remainingCpu -= mission.estimate.cpu;
     remainingEnergy -= mission.estimate.energy;
   }
+
+  // If any missions with this priority left, stop assigning to let buckets refill
+  if (Memory.offices[office].pendingMissions.some(o => o.priority === priority)) {
+    break;
+  }
 }
 ```
+
+Great, we're starting missions based on available resources! Now we actually need to run those missions. The first step is spawning. We'll submit a spawn order, adding the minion name to the mission's creepNames list to keep track of what we've already requested.
+
+```typescript
+export function spawnHarvestMission(mission: HarvestMission) {
+  if (mission.creepNames.length) return; // only need to spawn one minion
+
+  const franchisePlan = getFranchisePlanBySourceId(mission.data.source);
+  const franchiseSpawn = franchisePlan?.spawn.structure as StructureSpawn|undefined;
+  const franchiseContainer = franchisePlan?.container.pos;
+
+  const name = `HARVEST-${mission.office}-${Game.time % 10000}-${mission.data.source.slice(23)}`
+
+  scheduleSpawn(
+    mission.office,
+    mission.priority,
+    {
+      name,
+      body: MinionBuilders[MinionTypes.SALESMAN](spawnEnergyAvailable(mission.office))
+    },
+    mission.startTime,
+    (franchiseSpawn && franchiseContainer) ? {
+      spawn: franchiseSpawn.id,
+      directions: [franchiseSpawn.pos.getDirectionTo(franchiseContainer.x, franchiseContainer.y)]
+    } : undefined
+  )
+
+  mission.creepNames.push(name);
+}
+```
+
+Then it's just a matter of running the logic for the mission:
+
+```typescript
+export function runHarvestMission(mission: HarvestMission) {
+  const creep = Game.creeps[mission.creepNames[0]];
+  if (!creep) return;
+
+  if (mission.status !== MissionStatus.RUNNING) {
+    mission.status = MissionStatus.RUNNING;
+    // Record spawning expenses
+    mission.actual.cpu += 0.2 // Spawning intent
+    mission.actual.energy += minionCost(creep.body.map(p => p.type))
+  }
+
+  // Actual mission behavior goes here
+}
+```
+
+TODO:
+- Organize mission functions into lifecycles
+- Track mission's CPU usage in Mission Control
+- Invoke mission lifecycle functions from Mission Control
+- Extend Harvest mission to support multiple creeps, and multiple sources
