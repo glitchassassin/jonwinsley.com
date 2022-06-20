@@ -256,7 +256,7 @@ export function spawnHarvestMission(mission: HarvestMission) {
 }
 ```
 
-Then it's just a matter of running the logic for the mission:
+Then we need some logic for the mission:
 
 ```typescript
 export function runHarvestMission(mission: HarvestMission) {
@@ -272,6 +272,8 @@ export function runHarvestMission(mission: HarvestMission) {
 
   // Actual mission behavior goes here
 }
+
+
 ```
 
 TODO:
@@ -279,3 +281,4 @@ TODO:
 - Track mission's CPU usage in Mission Control
 - Invoke mission lifecycle functions from Mission Control
 - Extend Harvest mission to support multiple creeps, and multiple sources
+
