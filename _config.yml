@@ -10,6 +10,7 @@ google_analytics:
 disqus_account:
 github_repository: https://github.com/glitchassassin/jonwinsley.com
 addthis_id:
+fathom_id: COGTWDSF
 post_limit: 5
 
 # Social usernames/URLs
