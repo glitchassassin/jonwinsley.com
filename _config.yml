@@ -37,9 +37,5 @@ kramdown:
     default_lang: typescript
 
 permalink: pretty
-collections:
-  blog:
-    output: true
-    permalink: /:collection/:title
 
 exclude: [vendor]
