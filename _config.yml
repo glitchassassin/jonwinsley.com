@@ -6,26 +6,26 @@ baseurl: ""
 url: "http://jonwinsley.com/"
 title_description: "Hi, I'm Jon. I'm a developer, cloud architect, and aspiring entrepreneur."
 title_image: "/assets/profile_300.jpeg"
-google_analytics: 
-disqus_account: jonwinsley
+google_analytics:
+disqus_account:
 github_repository: https://github.com/glitchassassin/jonwinsley.com
-addthis_id: 
+addthis_id:
 post_limit: 5
 
 # Social usernames/URLs
 twitter_username: jonwinsley
-github_username:  glitchassassin
-instagram_username: 
-reddit_username: 
+github_username: glitchassassin
+instagram_username:
+reddit_username:
 linkedin_link: https://www.linkedin.com/in/jon-winsley/
-google_plus_link: 
-stackoverflow_link: 
+google_plus_link:
+stackoverflow_link:
 xing_link:
 facebook_link:
 
 # Footer
 #footer_left: "Theme made with <i class=\"fa fa-heart\"></i> by <a href=\"https://twitter.com/_JacobTomlinson\">Jacob Tomlinson</a>"
-footer_right: "Hiring? Check out <a href=\"https://glitchassassin.github.io/online-cv/\">my resume!</a>"
+footer_right: 'Hiring? Check out <a href="https://glitchassassin.github.io/online-cv/">my resume!</a>'
 
 # Build settings
 markdown: kramdown
