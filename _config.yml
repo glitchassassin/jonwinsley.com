@@ -36,5 +36,5 @@ kramdown:
   syntax_highlighter_opts:
     default_lang: typescript
 
-permalink: pretty
+permalink: /blog/:title
 exclude: [vendor]
