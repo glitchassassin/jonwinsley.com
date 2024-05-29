@@ -51,8 +51,8 @@ body {
   font-size: 16px;
   height: 100%;
   width: 100%;
-  background: $darkest;
-  background: linear-gradient(180deg, $darkest 0%, $dark 100%);
+  background: $darker;
+  background: linear-gradient(180deg, #{$darker} 0%, #{$dark} 100%);
   background-attachment: fixed;
 }
 
