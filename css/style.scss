@@ -51,12 +51,8 @@ body {
   font-size: 16px;
   height: 100%;
   width: 100%;
-  background: rgb(20, 20, 16);
-  background: linear-gradient(
-    180deg,
-    rgba(20, 20, 16, 1) 0%,
-    rgba(45, 45, 41, 1) 100%
-  );
+  background: $darkest;
+  background: linear-gradient(180deg, $darkest 0%, $dark 100%);
   background-attachment: fixed;
 }
 
@@ -133,7 +129,7 @@ ul {
     top: 20px;
     left: 40px;
   }
-  background: rgba(20, 20, 16, 0.5);
+  background: darkest;
 }
 
 .content-panel {
