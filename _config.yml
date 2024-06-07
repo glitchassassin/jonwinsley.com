@@ -2,8 +2,8 @@
 title: "glitchassassin"
 email: jon.winsley@gmail.com
 description: "Technical writeups and thought-provoking conversations."
-baseurl: ""
-url: "http://www.jonwinsley.com"
+baseurl: "https://www.jonwinsley.com"
+url: "https://www.jonwinsley.com"
 title_description: "Hi, I'm Jon. I'm a developer, cloud architect, and aspiring entrepreneur."
 title_image: "/assets/profile_300.jpeg"
 google_analytics:
