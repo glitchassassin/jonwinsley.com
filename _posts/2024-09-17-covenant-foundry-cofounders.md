@@ -3,7 +3,7 @@ layout: post
 title: "Covenant Foundry: Finding Christian Co-founders"
 date: 2024-09-17 18:10:00
 author: Jon Winsley
-summary:
+summary: I ran a survey to evaluate the need for helping Christians to find like-minded co-founders. The results are in.
 ---
 
 Recently, I ran a survey to evaluate the need for helping Christians to find like-minded co-founders.
