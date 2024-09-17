@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Covenant Foundry: Finding Christian Co-founders"
-date: 2024-09-16 21:00:00
+date: 2024-09-17 18:10:00
 author: Jon Winsley
 summary:
 ---
@@ -23,34 +23,49 @@ I mentioned above that I have an "abysmally small network." After distributing t
 The highlights, summarized and paraphrased:
 
 - Are you currently a founder?
-  - Yes (7), want to be (8)
+  - Want to be (8)
+  - Yes (7)
 - Are you interested in finding a Christian co-founder?
-  - Yes (11), maybe (2), no (2)
+  - Yes (11)
+  - Maybe (2)
+  - No (2)
 - What are the most important qualities of a co-founder?
-  - Shared Christian values; complementary skills and strengths; similar vision and goals
+  - Shared Christian values
+  - Complementary skills and strengths
+  - Similar vision and goals
 - How do your Christian values show up in your business practices?
-  - Integrity, and giving a framework for making decisions about every area of the business
+  - Integrity
+  - Giving a framework for making decisions about every area of the business
 - Which features of a co-founder matching service would be most valuable?
-  - A community of like-minded entrepreneurs; detailed profiles of potential co-founders; conversation starters to help evaluate a potential match
+  - A community of like-minded entrepreneurs
+  - Detailed profiles of potential co-founders
+  - Conversation starters to help evaluate a potential match
 - Do you have any concerns about such a service?
-  - Spam, low-quality applicants, different ideas about what "Christian values" actually mean
+  - Spam
+  - Low-quality applicants
+  - Different ideas about what "Christian values" actually mean
 - How likely would you be to use a service like this?
-  - On the fence (7), very likely (5), somewhat likely (2), somewhat unlikely (1)
+  - On the fence (7)
+  - Very likely (5)
+  - Somewhat likely (2)
+  - Somewhat unlikely (1)
 
 ## Analysis
 
-The survey was intentionally vague about what such a service might involve - partly because I wanted to let the survey results shape the outcome. And indeed they did. The basic ideas were there - yes, people liked the idea of finding a co-founder; but finding someone who is _actually_ a good match is key. And a directory of profiles (the core of my original idea) wasn't as important as the community component.
+The survey was intentionally vague about what such a service might involve - partly because I wanted to let the survey results shape the outcome. And indeed they did: the basic ideas were there - yes, people liked the idea of finding a co-founder; and finding someone who is _actually_ a good match is key. But a directory of profiles (the core of my original idea) wasn't as important as the community component.
 
-I ran across [a relevant X thread](https://x.com/theandreboso/status/1834189868076863889) while waiting for the results to roll in, and this too helped give some perspective to the problem: It's important to have a good relationship _before_ embarking on a venture together as co-founders.
+I ran across [a relevant X thread](https://x.com/theandreboso/status/1834189868076863889) while waiting for the results to roll in, and this too helped give some perspective to the problem: It's important to have a good, established relationship _before_ embarking on a venture together as co-founders.
 
-A profile directory doesn't solve this problem on its own. When you find a potential co-founder, you still need to get to know each other, and maybe work on a simple project together, to make sure you're really compatible.
+A profile directory doesn't solve this problem on its own. When you find a potential co-founder, you still need to get to know each other, and maybe work on a project together, to make sure you're really compatible.
 
 ## Proposal
 
-We'll start by keeping things simple: instead of building out a new app, we'll develop the community we've already started.
+Instead of starting with "how can we build a great app for this," let's start with the question "how can we make Covenant Foundry a great community for this?"
 
-1. Add a #find-a-cofounder channel to the [Covenant Foundry discord](https://covenantfoundry.com/) where you can share a profile with your skills, experience, and Christian testimony if you're interested in matching up with a co-founder
-2. Prompt conversation (either in group settings or in one-on-one "coffee chats") around specific aspects of business, the faith, etc.
-3. Highlight and encourage small short-term collaborative projects
+I have a few ideas:
+
+1. A #find-a-cofounder channel to the [Covenant Foundry discord](https://covenantfoundry.com/) where you can share a profile with your skills, experience, and Christian testimony if you're interested in matching up with a co-founder
+2. Opt-in prompted conversations (either in group settings or in one-on-one "coffee chats") around specific aspects of business, the faith, partnerships, etc.
+3. Invest in some better SEO to help other Christian founders find the community
 
 Let's see where we can go from here. [Join us at Covenant Foundry!](https://covenantfoundry.com/)
