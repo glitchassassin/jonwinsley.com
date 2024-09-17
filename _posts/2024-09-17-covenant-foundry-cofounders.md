@@ -68,4 +68,4 @@ I have a few ideas:
 2. Opt-in prompted conversations (either in group settings or in one-on-one "coffee chats") around specific aspects of business, the faith, partnerships, etc.
 3. Invest in some better SEO to help other Christian founders find the community
 
-Let's see where we can go from here. [Join us at Covenant Foundry!](https://covenantfoundry.com/)
+I'd love to hear your suggestions, too. [Join us at Covenant Foundry!](https://covenantfoundry.com/)
