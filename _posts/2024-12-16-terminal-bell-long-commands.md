@@ -3,7 +3,7 @@ layout: post
 title: "Terminal Bell for Long-Running Commands"
 date: 2024-12-16 14:29:00
 author: Jon Winsley
-summary: Zsh snippet to sound a BELL character when a long-running command finishes
+summary: "Attention span hack: Zsh snippet to sound a BELL character when a long-running command finishes"
 ---
 
 I work on Windows/WSL2 with multiple desktops, and sometimes when I have long-running tests I'll switch screens and completely lose track of where I was.
