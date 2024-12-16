@@ -17,6 +17,8 @@ Visual Studio Code (or Cursor) can play an audible cue from a terminal BELL char
 Then, in my `.zshrc`, I've added a couple zsh hooks that tracks when a command is started, and sends a bell when it's finished, if it took longer than 1 second:
 
 ```zsh
+autoload -Uz add-zsh-hook
+
 function notify_long_running_commands() {
   local stop=$SECONDS
   local elapsed=$(( stop - start ))
