@@ -95,8 +95,9 @@ assign minutes = 1 %}{% endif %} {% endif %}
             {{ page.tags | join: ', ' }}
           </small>
         </div>
+        {% endif %}
       </div>
-      {% endif %} {% if site.twitter_username and site.disqus_account %}
+      {% if site.twitter_username and site.disqus_account %}
       <div class="content-panel feedback">
         <a
           href="http://www.twitter.com/search?q={{ page.url | absolute_url | uri_escape }}"
