@@ -20,10 +20,12 @@ make-smaller-titles: true
 
       <div class="author-text">{{ site.title_description }}</div>
 
-      <video width="100%" controls>
-        <source src="/assets/introduction.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
+      <div class="video-container">
+        <video width="100%" controls>
+          <source src="/assets/introduction.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
 
       {% include social_links.html %}
     </div>

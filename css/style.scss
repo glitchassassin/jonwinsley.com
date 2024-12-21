@@ -139,9 +139,7 @@ ul {
   padding-left: 30px;
   padding-right: 30px;
   margin-top: 20px;
-  box-shadow:
-    0px 0px 0px 0px,
-    0px 6px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 0px 0px, 0px 6px 12px rgba(0, 0, 0, 0.2);
   border-bottom: 5px solid $light-blue;
 }
 
@@ -304,6 +302,13 @@ ul {
 
   .links {
     font-size: 2em;
+  }
+
+  .video-container {
+    margin-top: 30px;
+    margin-left: -30px;
+    margin-right: -30px;
+    margin-bottom: -30px;
   }
 
   .articles {
@@ -746,9 +751,7 @@ ul {
       width: auto;
       padding: 10px 20px;
       background-color: $darker;
-      box-shadow:
-        0px 0px 0px 0px,
-        0px 6px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: 0px 0px 0px 0px, 0px 6px 12px rgba(0, 0, 0, 0.2);
     }
 
     a:hover {
