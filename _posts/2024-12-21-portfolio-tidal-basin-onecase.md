@@ -6,6 +6,7 @@ author: Jon Winsley
 summary: "As lead architect, I helped guide technology decisions for Tidal Basin's Phoenix OneCase platform, a modern disaster relief case management solution."
 categories: portfolio
 series: portfolio
+image: /assets/phoenix-onecase.png
 ---
 
 At JBS, I've been working on custom software projects with Tidal Basin, one of our clients. [Here's a writeup](https://www.jbs.dev/resources/resource-center/case-studies/emergency-and-disaster-consulting-firm-expedites-relief-survivors-new-grant-system/) about our [Phoenix OneCase project](https://www.tidalbasingroup.com/education/brochures/phoenix-onecase/).
