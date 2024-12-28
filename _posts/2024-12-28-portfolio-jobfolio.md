@@ -1,9 +1,9 @@
 ---
 layout: post
 title: "Portfolio: Jobfolio"
-date: 2024-12-28 14:47:00
+date: 2024-12-28 08:17:00
 author: Jon Winsley
-summary: ""
+summary: "I built an MVP for Jobfolio, a job management app for the trades, with Remix and Prisma"
 categories: portfolio
 series: portfolio
 image: /assets/jobfolio.png
