@@ -7,6 +7,8 @@ summary: It's really easy to deploy a React Router app on AWS Lambda. This minim
 ---
 Spinning up a [React Router](https://reactrouter.com/) app on AWS Lambda - with server side rendering and everything - is pretty easy. Here, we'll be using [the AWS CDK](https://aws.amazon.com/cdk/) to define and create the resources in AWS.
 
+Here's [the working repo.](https://github.com/glitchassassin/react-router-lambda-demo)
+
 ## Set up React Router
 
 For this demo, I'm just using `create-react-router@latest` to set up a new project:
