@@ -28,7 +28,7 @@ npm install @react-router/architect
 
 Then, the handler itself is a simple wrapper of the build:
 
-```ts
+```typescript
 // server/lambda.ts
 
 import { createRequestHandler } from "@react-router/architect";
@@ -67,7 +67,7 @@ Time to set up the `cdk-stack`!
 
 AWS provides a [`NodejsFunction`](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_lambda_nodejs.NodejsFunction.html) construct that handles some of the packaging for us to build and deploy the server handler to Lambda. We'll use a function URL to invoke the Lambda rather than something like API Gateway.
 
-```ts
+```typescript
 // Set absolute path to the lambda.ts handler
 // __dirname is not available in ESM, but we can set it ourselves
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -108,7 +108,7 @@ If you deploy at this point, you can invoke the Lambda via its function URL! How
 
 Because the resources in the bucket will be served via CloudFront, the bucket itself does not need to be publicly accessible:
 
-```ts
+```typescript
 // Create S3 bucket for static assets
 const staticBucket = new s3.Bucket(this, 'StaticBucket', {
   enforceSSL: true,
@@ -122,7 +122,7 @@ const staticBucket = new s3.Bucket(this, 'StaticBucket', {
 
 Then we'll set up the CloudFront distribution. Note that we are disabling caching on the default behavior (the lambda) and using optimized caching on the static bucket. We're also using a BucketDeployment to publish the static assets to the bucket: this will automatically reset the CloudFront distribution's cache when resources are published.
 
-```ts
+```typescript
 // Create CloudFront distribution
 const distribution = new cloudfront.Distribution(this, 'Distribution', {
   defaultBehavior: {
