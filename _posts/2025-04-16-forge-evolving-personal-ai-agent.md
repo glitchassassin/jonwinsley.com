@@ -4,6 +4,7 @@ title: "Forge: Evolving a Personal AI Agent"
 date: 2025-04-16 17:00:00
 author: Jon Winsley
 summary: In which I begin to explore the potential of personal agents
+image: /assets/Forge.png
 ---
 The potential of AI agents continues to intrigue me, especially as newer models are released. OpenRouter demoed the mysterious "Quasar Alpha" model (now revealed to be a version of OpenAI's GPT 4.1) and it got further than any other model so far in my [text adventure agent experiment](https://www.jonwinsley.com/ai/2025/03/19/text-adventure-agents/).
 
@@ -12,8 +13,6 @@ I've been idly dreaming for a while about setting up a "real" agent that can run
 Ha! It's a rabbit hole.
 
 ## Iteration 1: Forge, A Discord Agent
-
-![A generated profile photo representing Forge, an AI agent](/assets/Forge.png)
 
 Although I want the agent to run locally (to access resources behind my firewall, like my local home automation server), I really want to be able to access it from anywhere. So, rather than building a web interface for it, I'm just wiring it up as a Discord bot. To keep things simple, for now, I'm running it with no user authentication on a private server.
 
