@@ -14,6 +14,8 @@ Ha! It's a rabbit hole.
 
 ## Iteration 1: Forge, A Discord Agent
 
+![A generated profile photo representing Forge, an AI agent](/assets/Forge.png)
+
 Although I want the agent to run locally (to access resources behind my firewall, like my local home automation server), I really want to be able to access it from anywhere. So, rather than building a web interface for it, I'm just wiring it up as a Discord bot. To keep things simple, for now, I'm running it with no user authentication on a private server.
 
 I experimented with this before for a [meme-bot](https://github.com/glitchassassin/meme-bot) that would generate appropriate memes based on recent conversations. That application flopped, but I did discover that Cursor is pretty good with [discord.js](https://discordjs.guide/#before-you-begin).
