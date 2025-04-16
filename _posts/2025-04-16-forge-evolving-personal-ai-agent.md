@@ -14,7 +14,7 @@ Ha! It's a rabbit hole.
 
 ## Iteration 1: Forge, A Discord Agent
 
-![A generated profile photo representing Forge, an AI agent](/assets/Forge.png)
+<img src="/assets/Forge.png" alt="A generated profile photo representing Forge, an AI agent" style="float: right; max-width: 33%; padding: 1em 0em;">
 
 Although I want the agent to run locally (to access resources behind my firewall, like my local home automation server), I really want to be able to access it from anywhere. So, rather than building a web interface for it, I'm just wiring it up as a Discord bot. To keep things simple, for now, I'm running it with no user authentication on a private server.
 
