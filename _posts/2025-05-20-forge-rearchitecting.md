@@ -38,19 +38,19 @@ But agents are more fun with more options, so of course Forge can invoke tools f
 
 MCP servers are connected dynamically via Discord interactions and modals:
 
-![A series of Discord messages listing connected MCP servers](Pasted image 20250520065643.png)
+![A series of Discord messages listing connected MCP servers](/assets/Pasted image 20250520065643.png)
 
 Since tools might be dangerous, I built in a tool call approval flow: tools may either be always approved (in which case they are called immediately) or manually approved. The user is prompted with a Discord message when a tool call requires approval; based on whether they click "approve" or "deny," an appropriate message is pushed to the messages table, and the tool call runs (or doesn't) with the next main loop.
 
 These tools can also be managed directly via Discord interactions:
 
-![A series of Discord messages listing MCP tools](Pasted image 20250520065717.png)
+![A series of Discord messages listing MCP tools](/assets/Pasted image 20250520065717.png)
 
 ## Results
 
 Forge is still pretty rough, but functional! The most useful application so far has been keeping me accountable to daily routines:
 
-![[Pasted image 20250513131143.png]]
+![A series of chat messages going through a daily routine checklist](/assets/Pasted image 20250513131143.png)
 
 Some of the rough edges that remain:
 
